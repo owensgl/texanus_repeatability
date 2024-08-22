@@ -1,0 +1,401 @@
+// Simulation of benthic-limnetic parallel divergence and then hybridization
+// Based on initial code by Ken Thompson
+// parallel and divergent give different seg var when they should not
+// Set to have one underdominant locus
+
+initialize() {
+	setSeed(rdunif(1, 0, asInteger(2^62) - 1));
+	initializeSLiMModelType("nonWF");
+
+
+	////////////////
+
+	// PARAMETERS //
+
+	// carrying capacity, K
+
+	defineConstant("K", 275);
+	defineConstant("L", 199999);                
+	defineConstant("Cluster_L",99999);
+	// BDM parameters
+	defineConstant("bdm_n",  2); // the number of bdm_loci (minimum 2)
+	defineConstant("bdm_s", selection); // the effect size of BDM interactions
+	
+	// parameters for spatial arrangement of BDMs
+	defineConstant("cluster_proportion", 2); // the size of the cluster, 1 = whole chromosome, 2 = half, 3 = third, etc.
+	defineConstant("cluster_size", integerDiv(Cluster_L, cluster_proportion)); // the size of the BDM cluster, in bp
+	defineConstant("cluster_start", integerDiv(Cluster_L, 2) - integerDiv(Cluster_L, cluster_proportion*2)); // the starting locus of the cluster
+	
+	// assign BDMs to loci based on the above
+	defineConstant("bdm_loci", c(1:bdm_n) * integerDiv(cluster_size, (bdm_n+1)) + cluster_start); // define the bdm loci
+
+	// ******************************
+	// BDM pairwise locus assignments
+	// ******************************
+	
+	// shuffles a vector of 0:bdm_n
+	// each pair = index the shuffled vector by 2s (done at fitness step)
+	// e.g. 0 1 2 3 -> 3 0 1 2, pairs are locus 3 and locus 0; locus 1 and 2
+	bdm_pairs_tmp = sample(0:(bdm_n-1), bdm_n);
+	cat("BDM pairs: " + paste(bdm_pairs_tmp) + "\n");
+	defineConstant("bdm_pairs", bdm_pairs_tmp);
+
+
+
+	// chromosome length
+
+
+
+
+
+	initializeMutationType("m1", 0.5, "f", 0.0);   // p1 marker
+	initializeMutationType("m2", 0.5, "f", 0.0);  // The BDM allele in p1 
+	initializeMutationType("m3", 0.5, "f", 0.0);  // The BDM allele in p2 
+	m1.color = "red";
+	m2.color = "blue";
+	m3.color = "green";
+
+	m1.convertToSubstitution = F; 
+	m2.convertToSubstitution = F;
+	m3.convertToSubstitution = F;
+
+
+	initializeGenomicElementType("g1", m1, 1e-200);
+	initializeGenomicElementType("g2", c(m2,m3),  c(1e-200,1e-200)); // RI loci are static (m1 included to allow fitness calc)
+
+	//initializeGenomicElement(g1, 0, L);
+
+	initializeMutationRate(1e-8);
+	rates = c(recom, 0.5, recom);
+        ends = c(99999, 100000, 199999);
+        initializeRecombinationRate(rates, ends);
+//	initializeRecombinationRate(recom);
+
+	// define the neutral alleles
+	defineConstant("neutral_loci", ((c(1:100) * integerDiv(L, (100+1)))) + 10);
+
+
+	for (index in 0:(size(bdm_loci)-1)){
+		initializeGenomicElement(g2, bdm_loci[index], bdm_loci[index]);
+	}
+	for (index in 0:(size(neutral_loci)-1)){
+		initializeGenomicElement(g1, neutral_loci[index], neutral_loci[index]);
+	}
+
+}
+
+
+///////////////////////////////////////////////////
+
+////////////// DEFINE SUBPOPULATIONS //////////////
+
+///////////////////////////////////////////////////
+
+
+
+1 early() {
+
+sim.addSubpop("p1", 1000);
+
+sim.addSubpop("p2", 1000);
+
+sim.addSubpop("p3", 0);
+sim.addSubpop("p4", 0);
+sim.addSubpop("p5", 0);
+
+for (i in bdm_loci){
+	
+	p1.individuals.genomes.addNewDrawnMutation(m2, i);
+	p2.individuals.genomes.addNewDrawnMutation(m3, i);
+				
+}
+
+for (i in neutral_loci){
+	
+	p1.individuals.genomes.addNewDrawnMutation(m1, i);
+				
+}
+
+}
+
+
+
+//////////////////////////////////////////////////
+
+////////////// NULLIFY MUTATION DFE //////////////
+
+//////////////////////////////////////////////////
+
+
+
+// tell SLiM to ignore m1 
+
+fitness(m1) { return 1.0; }
+fitness(m2) { return 1.0; }
+fitness(m3) { return 1.0; }
+
+
+
+
+
+
+///////////////////////////////////////////
+
+////////////// HYBRIDIZATION //////////////
+
+///////////////////////////////////////////
+
+
+// want one parent from p1 and other from p2
+
+2 reproduction() {
+
+
+///////////
+
+/// F1s ///
+
+///////////
+
+
+// make parameter later
+
+// randomly draw N_f1s individuals from each of the two populations
+
+parents_pop1 = sample(p1.individuals, 1);
+
+parents_pop2 = sample(p2.individuals, 1);
+
+
+parent_vec = c(parents_pop1, parents_pop2);
+
+
+
+// draw monogamous pairs and generate litters
+
+for (i in 0:0)
+
+{
+
+parent1 = parent_vec[i];
+
+parent2 = parent_vec[i + 1];
+
+
+p3.addCrossed(parent1, parent2);
+
+}
+
+
+// disable this callback for this generation
+
+self.active = 0;
+
+
+
+}
+
+
+
+
+
+3 reproduction() {
+
+///////////
+
+/// BC1s ///
+
+///////////
+
+// draw N_hybrids F1s
+
+parents_pop1 = sample(p1.individuals, 1);
+parents_pop2 = sample(p3.individuals, 1);
+
+BC1_vec = c(parents_pop1, parents_pop2);
+
+
+
+for (i in 0:0)
+
+{
+
+parent1 = BC1_vec[i];
+
+parent2 = BC1_vec[i + 1];
+
+
+for (j in seqLen(K)){
+
+p4.addCrossed(parent1, parent2);
+p5.addCrossed(parent1, parent2);
+
+
+}
+
+}
+
+// disable this callback for this generation
+
+self.active = 0;
+
+}
+
+
+
+
+///////////////////////////
+///// Reproduction in BC1 populations
+///////////////////////////
+
+4:9 reproduction() {
+
+// randomize the order of p1.individuals
+
+for (s in c(p4,p5)) {
+
+parents = sample(s.individuals, s.individualCount);
+
+
+// draw monogamous pairs and generate litters
+
+for (i in seq(0, s.individualCount - 2, by=2))
+
+{
+
+parent1 = parents[i];
+
+parent2 = parents[i + 1];
+
+litterSize = rpois(1, 10);
+
+// litterSize = 2;
+
+
+
+for (j in seqLen(litterSize))
+
+s.addCrossed(parent1, parent2);
+
+}
+
+
+// disable this callback for this generation
+
+self.active = 0;
+
+}
+
+}
+
+///////////////////////////
+///// Mortality in BC1 populations
+///////////////////////////
+
+// we loop the fitness calculation over populations; defining optimum within
+
+4:9 early() {
+catn("Hello");
+	for (inds in sim.subpopulations.individuals){
+
+
+		// initialize fitness pairwise fitness penalities at 0
+		negative_epistasis = rep(0.0, bdm_n);
+	
+		// where are the p1 and p2 bdm *alleles* in each genome?
+		p1_bdm_locations = c(inds.genome1.positionsOfMutationsOfType(m2), inds.genome2.positionsOfMutationsOfType(m2));
+		p2_bdm_locations = c(inds.genome1.positionsOfMutationsOfType(m3), inds.genome2.positionsOfMutationsOfType(m3));
+	
+		// scan each pair of negatively interacting bdm loci (assigned in the starting parameters)
+	
+		for (i in 0:((bdm_n/2) -1)){
+	
+			// identify the two negatively interacting loci
+			// (indexes the bdm_pairs vector by 2s)
+			p1_locus = bdm_loci[bdm_pairs[i*2]];
+			p2_locus = bdm_loci[bdm_pairs[i*2 + 1]];
+		
+			// count the number of BDM alleles in each genome (if any)
+			num_p1_alleles = sum(p1_bdm_locations == p1_locus);
+			num_p2_alleles = sum(p2_bdm_locations == p2_locus);
+		
+			// multiply these together to get a 'bdm_genotype'
+			bdm_genotype = num_p1_alleles * num_p2_alleles;
+			penalty = 0;
+			if (num_p1_alleles == 1){
+				penalty = penalty + bdm_s;
+			}
+                        if (num_p2_alleles == 1){
+                                penalty = penalty + bdm_s;
+                        }
+			negative_epistasis[i] = penalty;
+		
+			
+		}
+
+		epistasis_penalty = ifelse(sum(negative_epistasis) > 1, 1.0, sum(negative_epistasis));
+
+		inds.fitnessScaling = 1- epistasis_penalty;
+	}
+	inds = sim.subpopulations.individuals;
+
+	
+	//Don't count olds for population size
+	p4_olds = sum(p4.individuals.age >= 1);
+	p5_olds = sum(p5.individuals.age >= 1);
+	
+	p4.fitnessScaling = min(K / (p4.individualCount - p4_olds), 1.5);
+   p5.fitnessScaling = min(K / (p5.individualCount - p5_olds), 1.5);
+   p1.fitnessScaling = 0;
+   p2.fitnessScaling = 0;
+   p3.fitnessScaling = 0;
+
+}
+
+
+
+// report on simulation
+
+3:9 late() {
+
+
+
+
+//if (sim.generation % 1 == 0)
+
+//catn(sim.generation + ": p4 size == " + p4.individualCount );
+
+}
+
+// end simulation and output
+
+
+9 late() {
+
+//sim.outputFull(ages=F);
+
+p4g = sample(p4.individuals, 30).genomes;
+		
+p1Total = sum(p4g.countOfMutationsOfType(m1));
+maxTotal = p4g.size() * 100;
+p1TotalFraction = p1Total / maxTotal;
+//catn("Fraction with p1 ancestry in p4: " + p1TotalFraction);
+
+p5g = sample(p5.individuals, 30).genomes;
+		
+p1Total = sum(p5g.countOfMutationsOfType(m1));
+maxTotal = p5g.size() * 100;
+p1TotalFraction = p1Total / maxTotal;
+//catn("Fraction with p1 ancestry in p5: " + p1TotalFraction);
+
+catn("chr\tpos\tpr_1_p1\tpr_1_p2\tpr_6_p1\tpr_6_p2\treads_1_p1\treads_1_p2\treads_6_p1\treads_6_p2");
+for (mut in sim.mutations)
+			{
+				if (mut.mutationType == m1){
+					mutFreq_p4 = mean(asInteger(p4.genomes.containsMutations(mut)));
+					mutFreq_p5 = mean(asInteger(p5.genomes.containsMutations(mut)));
+					catn("01\t"+ mut.position + "\t0.75\t0.75\t" + mutFreq_p4 + "\t" + mutFreq_p5 + "\t550\t550\t60\t60" );
+				}
+			}
+
+}

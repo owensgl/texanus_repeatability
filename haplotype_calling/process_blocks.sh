@@ -1,0 +1,1 @@
+for parent in ann1 ann2 ann3 deb; do for i in `ls $parent | grep posterior`; do name=$(echo $i | sed 's/.posterior//g'); cat $parent/$i | perl ../bin/ancestry_hmm2blocks.pl > $parent/$name.blocks.txt; done; done

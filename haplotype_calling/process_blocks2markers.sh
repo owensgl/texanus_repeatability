@@ -1,0 +1,1 @@
+for parent in ann1 ann2 ann3 deb; do for i in `ls $parent | grep posterior`; do name=$(echo $i | sed 's/.posterior//g'); cat $parent/$name.blocks.txt | perl ../bin/blocks2markers.pl > $parent/$name.markers.txt; done; done

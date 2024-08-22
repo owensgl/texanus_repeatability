@@ -1,0 +1,26 @@
+trait	full_name	class	order
+HoleDam	Hole damage	Defense	1
+SuckDam	Leaf vascular tissue damage	Defense	2
+ChewDam	Leaf-chewing damage	Defense	3
+MidgeDam	Midge damage	Defense	4
+RecepDam	Receptacle damage	Defense	5
+Rhodo	Rhodobaenus weevil damage	Defense	6
+StemB	Stem borer damage	Defense	7
+Bushy	Bushiness	Morphology	8
+GlandDens	Glandular trichrome density	Morphology	9
+HtLow	Height of lowest branch	Morphology	10
+CNratio	Leaf Carbon:Nitrogen	Morphology	11
+Succ	Leaf succulence	Morphology	12
+HairDens	Nonglandular trichrome density	Morphology	13
+Volume	Plant volume	Morphology	14
+RelBrDiam	Relative branch diameter	Morphology	15
+SLA	Specific Leaf Area	Morphology	16
+WUE	Water use efficiency	Morphology	17
+DaysToBud	Days to bud	Reproduction	18
+DiskDiam	Disk diameter	Reproduction	19
+InflNum	Inflorence Number	Reproduction	20
+Longevity	Longevity	Reproduction	21
+SMT	Seed maturation time	Reproduction	22
+SeedWt	Seed weight	Reproduction	23
+SeedsPerInfl	Seeds per inflorence	Reproduction	24
+GoodSeeds	Seed viability	Reproduction	25
