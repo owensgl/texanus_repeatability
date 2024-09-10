@@ -1,3 +1,5 @@
+## Files
+
 GBS_sra_data.txt: SRA numbers for all samples used.
 
 phenotype_data.txt: Phenotype data for BC1 samples.
