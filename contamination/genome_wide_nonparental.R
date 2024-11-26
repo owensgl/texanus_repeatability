@@ -1,3 +1,4 @@
+#Plotting non-parental ancestry from the number of haplotypes found in each position of the genome after HMM
 library(tidyverse)
 library(cowplot)
 library(zoo)

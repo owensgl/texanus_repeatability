@@ -1,3 +1,4 @@
+#Plotting the number of alleles found in each sample that weren't present in theBC1 generation
 library(tidyverse)
 library(cowplot)
 library(patchwork)

@@ -1,0 +1,5 @@
+Common Garden	Longitude	Latitude	MAT (°C)	Mean Diurnal Range (°C)	Isothermality	Temp Seasonality (stdev × 100)	Max Temp Warmest Month (°C)	Min Temp Coldest Month (°C)	Temp Annual Range (°C)	Mean Temp Wettest Qtr (°C)	Mean Temp Driest Qtr (°C)	Mean Temp Warmest Qtr (°C)	Mean Temp Coldest Qtr (°C)	MAP (mm)	Precip Wettest Month (mm)	Precip Driest Month (mm)	Precip Seasonality	Precip Wettest Qtr (mm)	Precip Driest Qtr (mm)	Precip Warmest Qtr (mm)	Precip Coldest Qtr (mm)
+BFL	-97.78	30.28	19.85	11.69	37.72	708.38	34.79999924	3.799999952	31	23.45	12.47	28.22	10.78	820	120	46	33.96	282	149	197	151
+HCC	-95.04	29.39	20.67	8.85	34.71	625.47	32.40000153	6.900000095	25.50000191	27.63	16.78	27.98	12.63	1230	162	71	25.22	382	217	352	263
+KPC	-95.92	29.93	19.90	12.51	40.09	690.37	34.90000153	3.700000048	31.20000076	21.05	15.67	27.95	11.00	1055	125	62	23.61	314	212	245	236
+LBJ	-97.88	30.18	19.36	12.43	38.95	716.37	34.79999924	2.900000095	31.89999962	23.05	11.93	27.83	10.22	849	123	48	33.91	292	154	206	155

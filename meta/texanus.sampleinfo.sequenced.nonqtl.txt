@@ -1,3 +1,4 @@
+ID	year	gen	plot_type	type	location	lane1	lane2	lane3	tech
 2004.104	2004	2.5	LBJBC	BC	LBJ	Texanus_20_21	NA	NA	GBS2
 2004.105	2004	2.5	LBJBC	BC	LBJ	Texanus_20_21	NA	NA	GBS2
 2004.109	2004	2.5	LBJBC	BC	LBJ	Texanus_20_21	NA	NA	GBS2
